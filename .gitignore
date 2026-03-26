@@ -1,0 +1,9 @@
+# signing certificates
+*.pfx
+cert.txt
+
+# build output
+build/
+dist/
+__pycache__/
+*.spec
