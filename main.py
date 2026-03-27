@@ -65,8 +65,7 @@ async def main():
     BGIMAGE.blit(boardImage, boardImageRect)
     
     while True:
-        if await runGame() == False:
-            break
+        await runGame()
 
 def getSpaceClicked(mousex, mousey):
     x = (mousex - XMARGIN) // SPACESIZE
@@ -131,11 +130,6 @@ async def runGame():
                     else:
                         boardToDraw = mainBoard
                     pygame.event.pump()
-                    for event in pygame.event.get(QUIT, pump=False):
-                        terminate()
-                    for event in pygame.event.get(KEYUP, pump=False):
-                        if event.key == K_ESCAPE:
-                            terminate()
                     for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
                         mousex, mousey = event.pos
                         if newGameRect.collidepoint((mousex, mousey)):
@@ -217,24 +211,19 @@ async def runGame():
     
     while True:
         pygame.event.pump()
-        for event in pygame.event.get(QUIT, pump=False):
-            terminate()
-        for event in pygame.event.get(KEYUP, pump=False):
-            if event.key == K_ESCAPE:
-                terminate()
         for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
             mousex, mousey = event.pos
             if yesRect.collidepoint((mousex, mousey)):
                 return True
             elif noRect.collidepoint((mousex, mousey)):
-                return False
+                return True
         for event in pygame.event.get(FINGERDOWN, pump=False):
             mousex = int(event.x * WINDOWWIDTH)
             mousey = int(event.y * WINDOWHEIGHT)
             if yesRect.collidepoint((mousex, mousey)):
                 return True
             elif noRect.collidepoint((mousex, mousey)):
-                return False
+                return True
         DISPLAYSURF.blit(textSurf, textRect)
         DISPLAYSURF.blit(text2Surf, text2Rect)
         DISPLAYSURF.blit(yesSurf, yesRect)
@@ -272,11 +261,6 @@ async def animateTileChange(tilesToFlip, tileColor, additionalTile, mainBoard):
         pygame.display.update()
         MAINCLOCK.tick(ANIMATIONSPEED)
         pygame.event.pump()
-        for event in pygame.event.get(QUIT, pump=False):
-            terminate()
-        for event in pygame.event.get(KEYUP, pump=False):
-            if event.key == K_ESCAPE:
-                terminate()
         await asyncio.sleep(0)
 
 def drawBoard(board):
@@ -346,11 +330,6 @@ async def enterPlayerTile():
     oRect.center = (int(WINDOWWIDTH / 2) + 60, int(WINDOWHEIGHT / 2) + 40)
     while True:
         pygame.event.pump()
-        for event in pygame.event.get(QUIT, pump=False):
-            terminate()
-        for event in pygame.event.get(KEYUP, pump=False):
-            if event.key == K_ESCAPE:
-                terminate()
         for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
             mousex, mousey = event.pos
             if xRect.collidepoint((mousex, mousey)):
@@ -438,19 +417,6 @@ def getOpponentTile(tile):
         return BLACK_TILE
     else:
         return WHITE_TILE
-
-def checkForQuit():
-    for event in pygame.event.get(QUIT):
-        terminate()
-    for event in pygame.event.get(KEYUP):
-        if event.key == K_ESCAPE:
-            terminate()
-        else:
-            pygame.event.post(event)
-
-def terminate():
-    pygame.quit()
-    sys.exit()
 
 
 asyncio.run(main())

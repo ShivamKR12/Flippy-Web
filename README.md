@@ -107,7 +107,6 @@ For a complete ruleset, refer to the official Othello rules.
 ## Controls
 
 - **Mouse Click**: Place tiles on the board or interact with on-screen buttons.
-- **ESC Key**: Exit the game immediately.
 - **Hints Button**: Toggle the display of valid move highlights.
 - **New Game Button**: Reset the board and start a fresh game.
 
