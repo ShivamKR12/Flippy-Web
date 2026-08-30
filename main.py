@@ -130,7 +130,7 @@ async def runGame():
                     else:
                         boardToDraw = mainBoard
                     pygame.event.pump()
-                    for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
+                    for event in pygame.event.get(pygame.MOUSEBUTTONUP, pump=False):
                         mousex, mousey = event.pos
                         if newGameRect.collidepoint((mousex, mousey)):
                             return True
@@ -139,7 +139,7 @@ async def runGame():
                         movexy = getSpaceClicked(mousex, mousey)
                         if movexy != None and not isValidMove(mainBoard, playerTile, movexy[0], movexy[1]):
                             movexy = None
-                    for event in pygame.event.get(FINGERDOWN, pump=False):
+                    for event in pygame.event.get(pygame.FINGERDOWN, pump=False):
                         mousex = int(event.x * WINDOWWIDTH)
                         mousey = int(event.y * WINDOWHEIGHT)
                         if newGameRect.collidepoint((mousex, mousey)):
@@ -211,13 +211,13 @@ async def runGame():
     
     while True:
         pygame.event.pump()
-        for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
+        for event in pygame.event.get(pygame.MOUSEBUTTONUP, pump=False):
             mousex, mousey = event.pos
             if yesRect.collidepoint((mousex, mousey)):
                 return True
             elif noRect.collidepoint((mousex, mousey)):
                 return True
-        for event in pygame.event.get(FINGERDOWN, pump=False):
+        for event in pygame.event.get(pygame.FINGERDOWN, pump=False):
             mousex = int(event.x * WINDOWWIDTH)
             mousey = int(event.y * WINDOWHEIGHT)
             if yesRect.collidepoint((mousex, mousey)):
