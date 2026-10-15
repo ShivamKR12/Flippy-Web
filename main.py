@@ -6,7 +6,6 @@
 
 import random, sys, pygame, copy
 import asyncio
-from pygame.locals import *
 
 FPS = 10
 WINDOWWIDTH = 640
@@ -330,7 +329,7 @@ async def enterPlayerTile():
     oRect.center = (int(WINDOWWIDTH / 2) + 60, int(WINDOWHEIGHT / 2) + 40)
     while True:
         pygame.event.pump()
-        for event in pygame.event.get(MOUSEBUTTONUP, pump=False):
+        for event in pygame.event.get(pygame.MOUSEBUTTONUP, pump=False):
             mousex, mousey = event.pos
             if xRect.collidepoint((mousex, mousey)):
                 return [WHITE_TILE, BLACK_TILE]

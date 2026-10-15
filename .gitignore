@@ -1,9 +1,32 @@
-# signing certificates
-*.pfx
-cert.txt
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# build output
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging / build artifacts
 build/
 dist/
-__pycache__/
+*.egg-info/
+.eggs/
+
+# PyInstaller / Desktop specs
 *.spec
+*.ico
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files & logs
+*.log
+temp.txt
