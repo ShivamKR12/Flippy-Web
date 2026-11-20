@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'main.py'
-      - 'default.tmpl'
       - '.github/workflows/pygbag.yml'
   workflow_dispatch:
 
