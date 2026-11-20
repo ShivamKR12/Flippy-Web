@@ -1,0 +1,301 @@
+<html lang="en-us"><script src="{{cookiecutter.cdn}}pythons.js" type=module id="site" data-python="python{{cookiecutter.PYBUILD}}" data-LINES=42 data-COLUMNS=132 data-os="vtx,snd,gui" async defer>#<!--
+
+import sys
+import asyncio
+import platform
+from pathlib import Path
+
+async def custom_site():
+    import embed
+    platform.document.body.style.background = "#091b12"
+    platform.window.canvas.style.visibility = "visible"
+
+    bundle = "{{cookiecutter.archive}}"
+    appdir = Path(f"/data/data/{bundle}")
+    appdir.mkdir()
+
+    if platform.window.location.host.find('.itch.zone') > 0:
+        import zipfile
+        async with platform.fopen("{{cookiecutter.archive}}.apk", "rb") as archive:
+            with zipfile.ZipFile(archive) as zip_ref:
+                zip_ref.extractall(appdir.as_posix())
+    else:
+        import tarfile
+        async with platform.fopen("{{cookiecutter.archive}}.tar.gz", "rb") as archive:
+            tar = tarfile.open(fileobj=archive, mode="r:gz")
+            tar.extractall(path=appdir.as_posix(), filter='tar')
+            tar.close()
+
+    platform.run_main(PyConfig, loaderhome=appdir / "assets", loadermain=None)
+
+    while embed.counter() < 0:
+        await asyncio.sleep(.1)
+
+    main = appdir / "assets" / "main.py"
+
+    if not platform.window.MM.UME:
+        __import__(__name__).__file__ = main
+        start_gate = platform.window.document.getElementById("start-gate")
+        if start_gate:
+            start_gate.classList.add("active")
+        while not platform.window.MM.UME:
+            await asyncio.sleep(.1)
+        if start_gate:
+            start_gate.classList.remove("active")
+
+    await TopLevel_async_handler.start_toplevel(platform.shell, console=False)
+    __import__(__name__).__file__ = main
+
+    def ui_callback(pkg):
+        loader_text = platform.window.document.getElementById("loader-text")
+        if loader_text:
+            loader_text.innerText = f"Loading {pkg}..."
+
+    await shell.source(main, callback=ui_callback)
+
+    loader = platform.window.document.getElementById("loading-screen")
+    if loader:
+        loader.style.opacity = "0"
+        await asyncio.sleep(0.3)
+        loader.style.display = "none"
+
+    platform.window.window_resize()
+
+asyncio.run(custom_site())
+
+# BEGIN BLOCK
+# =============================================================================
+# --></script><head><!--
+    {%- if cookiecutter.comment != "" -%}
+{{cookiecutter.comment}}
+    {% endif %}
+--><script type="application/javascript">
+// END BLOCK
+
+config = {
+    xtermjs : "0",
+    _sdl2 : "canvas",
+    user_canvas : 0,
+    user_canvas_managed : 0,
+    gui_divider : 1,
+    ume_block : {{cookiecutter.ume_block}},
+    can_close : {{cookiecutter.can_close}},
+    archive : "{{cookiecutter.archive}}",
+    gui_debug : 0,
+    cdn : "{{cookiecutter.cdn}}",
+    autorun : {{cookiecutter.autorun}},
+    PYBUILD : "{{cookiecutter.PYBUILD}}",
+    fb_ar   : 1.333,
+    fb_width : "640",
+    fb_height : "480"
+};
+</script>
+
+    <title>Flippy &bull; Reversi Strategy Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #091b12;
+            color: #ecfdf5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-frame {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #153927 0%, #091b12 100%);
+        }
+
+        /* Strict rule: NO borders or padding on canvas */
+        canvas.emscripten {
+            border: 0px none !important;
+            padding: 0 !important;
+            margin: auto;
+            max-width: 100vw;
+            max-height: 100vh;
+            aspect-ratio: 640 / 480;
+            object-fit: contain;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.22), 0 20px 45px rgba(0, 0, 0, 0.9);
+            border-radius: 4px;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: absolute;
+            inset: 0;
+            background: #091b12;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: opacity 0.35s ease;
+        }
+
+        .board-logo {
+            font-size: 2.3rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: #34d399;
+            text-shadow: 0 0 16px rgba(52, 211, 153, 0.7), 0 0 35px rgba(16, 185, 129, 0.4);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        .board-subtitle {
+            font-size: 0.85rem;
+            color: #a7f3d0;
+            letter-spacing: 0.12em;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .progress-track {
+            width: 280px;
+            height: 6px;
+            background: #173827;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #facc15);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        #loader-text {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #6ee7b7;
+            font-family: monospace;
+        }
+
+        /* Start Click Gate */
+        #start-gate {
+            position: absolute;
+            inset: 0;
+            background: rgba(9, 27, 18, 0.88);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 60;
+            cursor: pointer;
+        }
+
+        #start-gate.active { display: flex; }
+
+        .play-btn {
+            padding: 14px 34px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #062315;
+            background: #34d399;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.6);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(52, 211, 153, 0.85);
+        }
+
+        /* Fullscreen toggle */
+        #fs-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(21, 57, 39, 0.75);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #a7f3d0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 40;
+            backdrop-filter: blur(4px);
+        }
+        #fs-btn:hover { color: #fff; border-color: #34d399; }
+
+        #transfer, #pyconsole, #infobox, #crt, #dlg, #html { display: none !important; }
+    </style>
+</head>
+
+<body>
+    <div id="game-frame">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=1></canvas>
+        <button id="fs-btn" onclick="toggleFullScreen()">Fullscreen</button>
+
+        <div id="loading-screen">
+            <h1 class="board-logo">FLIPPY</h1>
+            <p class="board-subtitle">Classic Reversi Strategy</p>
+            <div class="progress-track">
+                <div class="progress-fill" id="custom-progress"></div>
+            </div>
+            <div id="loader-text">Loading WebAssembly engine...</div>
+        </div>
+
+        <div id="start-gate" onclick="handleStart()">
+            <button class="play-btn">Play Flippy Reversi</button>
+        </div>
+    </div>
+
+    <div id="transfer"><div id="status"></div><progress id="progress" value="0" max="100"></progress></div>
+    <div id="infobox"></div>
+    <div id="html"></div>
+    <div id="dlg" hidden><input type="file" id="dlg_multifile"></div>
+    <div id="pyconsole"><div id="terminal"></div></div>
+
+    <script type="application/javascript">
+    const progressBar = document.getElementById("custom-progress");
+    const progressEl = document.getElementById("progress");
+    const statusEl = document.getElementById("status");
+    const loaderText = document.getElementById("loader-text");
+
+    const observer = new MutationObserver(() => {
+        const val = progressEl.getAttribute("value") || "0";
+        if (progressBar) progressBar.style.width = val + "%";
+        if (loaderText && statusEl.innerText) loaderText.innerText = statusEl.innerText;
+    });
+    observer.observe(progressEl, { attributes: true });
+
+    function handleStart() {
+        if (window.MM && window.MM.UME !== undefined) window.MM.UME = true;
+        document.getElementById("start-gate").classList.remove("active");
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    }
+
+    async function custom_onload(debug_hidden) {
+        if (document.getElementById("pyconsole")) document.getElementById("pyconsole").hidden = true;
+    }
+    </script>
+</body>
+</html>
